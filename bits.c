@@ -24,8 +24,6 @@ const unsigned int multfour[] = {
     32, 36, 40, 44, 48, 52, 56, 60, 64,
 };
 
-#define NELEM(x) if(x) {sizeof(x)/sizeof((x)[0])} else {0}
-
 unsigned int reverseBits1(unsigned int num) {
     unsigned int x, bit, i, j;
 
