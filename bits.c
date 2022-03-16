@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const unsigned int bitsInUint = sizeof(unsigned int) * 8;
-
 typedef struct Test Test;
 
 struct Test {
@@ -10,7 +8,25 @@ struct Test {
     unsigned int expected;
 };
 
-unsigned int reverseBits(unsigned int num) {
+const unsigned int bitsInUint = sizeof(unsigned int) * 8;
+
+// revmap is an array of nibbles that are the reverse of their index
+const unsigned int revmap[] = {
+    0x0, 0x8, 0x4, 0xc, 
+    0x2, 0xa, 0x6, 0xe, 
+    0x1, 0x9, 0x5, 0xd, 
+    0x3, 0xb, 0x7, 0xf,
+};
+
+// multfour is an array of multiples of four
+const unsigned int multfour[] = {
+    0, 4, 8, 12, 16, 20, 24, 28, 
+    32, 36, 40, 44, 48, 52, 56, 60, 64,
+};
+
+#define NELEM(x) if(x) {sizeof(x)/sizeof((x)[0])} else {0}
+
+unsigned int reverseBits1(unsigned int num) {
     unsigned int x, bit, i, j;
 
     x = 0;
@@ -19,6 +35,18 @@ unsigned int reverseBits(unsigned int num) {
         if ((num & bit) == bit) {
             x |= 1 << j;
         }
+    }
+    return x;
+}
+
+unsigned int reverseBits2(unsigned int num) {
+    unsigned int x, i, nibbles, rev;
+
+    x = 0;
+    nibbles = sizeof(unsigned int) << 1;
+    for (i = 0; i < nibbles; i++) {
+        rev = revmap[(num & 0xf << multfour[i]) >> multfour[i]];
+        x |= rev << multfour[nibbles - 1 - i];
     }
     return x;
 }
@@ -37,9 +65,17 @@ int main(int argc, char **argv) {
     };
 
     for (t = tests; *t; t++) {
-        got = reverseBits((*t)->input);
+        got = reverseBits1((*t)->input);
         if (got != (*t)->expected) {
-            fprintf(stderr, "\ninput:    0x%x\nexpected: 0x%x\ngot:      0x%x\n", 
+            fprintf(stderr, "reversebits1:\n\tinput:    0x%x\n\texpected: 0x%x\n\tgot:      0x%x\n", 
+                (*t)->input, (*t)->expected, got);
+            exit(EXIT_FAILURE);
+        }
+    }
+    for (t = tests; *t; t++) {
+        got = reverseBits2((*t)->input);
+        if (got != (*t)->expected) {
+            fprintf(stderr, "reversebits2:\n\tinput:    0x%x\n\texpected: 0x%x\n\tgot:      0x%x\n", 
                 (*t)->input, (*t)->expected, got);
             exit(EXIT_FAILURE);
         }
