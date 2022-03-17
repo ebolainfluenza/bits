@@ -24,7 +24,6 @@ testbits: mkrevmap2 libbits.a testbits.c
 
 nuke: clean
 	rm -f revmap2.h
-	touch revmap2.h
 
 clean:
 	rm -f *.out *.$(ARCH) $(TARGS)
