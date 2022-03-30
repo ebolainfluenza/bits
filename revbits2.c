@@ -4,7 +4,7 @@
 #include "bits2.h"
 #include "revmap2.h"
 
-// revmap is an array of nibbles that are the reverse of their index
+// revmap is an array of nibbles that are the reverse bits of their index
 static const unsigned int revmap[] = {
     0x0, 0x8, 0x4, 0xc, 
     0x2, 0xa, 0x6, 0xe, 
@@ -24,25 +24,25 @@ static const unsigned int multeight[] = {
 };
 
 unsigned int reverseBits2(unsigned int num) {
-    unsigned int x, i, nibbles, rev;
+    unsigned int x, i, nibbles, index;
 
     x = 0;
     nibbles = sizeof(unsigned int) << 1;
     for (i = 0; i < nibbles; i++) {
-        rev = revmap[(num & 0xf << multfour[i]) >> multfour[i]];
-        x |= rev << multfour[nibbles - 1 - i];
+        index = (num & 0xf << multfour[i]) >> multfour[i];
+        x |= revmap[index] << multfour[nibbles - 1 - i];
     }
     return x;
 }
 
 unsigned int reverseBits3(unsigned int num) {
-    unsigned int x, i, nbytes, rev;
+    unsigned int x, i, nbytes, index;
 
     x = 0;
     nbytes = sizeof(unsigned int);
     for (i = 0; i < nbytes; i++) {
-        rev = revmap2[(num & 0xff << multeight[i]) >> multeight[i]];
-        x |= rev << multeight[nbytes - 1 - i];
+        index = (num & 0xff << multeight[i]) >> multeight[i];
+        x |= revmap2[index] << multeight[nbytes - 1 - i];
     }
     return x;
 }
