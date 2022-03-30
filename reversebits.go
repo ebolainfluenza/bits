@@ -9,7 +9,7 @@ type Test struct {
 	expected uint
 }
 
-// revmap is an slice of nibbles that are the reverse of their index
+// revmap is an slice of nibbles that are the reverse bits of their index
 var revmap = []uint{
 	0x0, 0x8, 0x4, 0xc,
 	0x2, 0xa, 0x6, 0xe,
@@ -17,7 +17,7 @@ var revmap = []uint{
 	0x3, 0xb, 0x7, 0xf,
 }
 
-// revmap2 is a slice of bytes that reverse their index
+// revmap2 is a slice of bytes that reverse bits their index
 var revmap2 = []uint{
 	0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0, 0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
 	0x08, 0x88, 0x48, 0xc8, 0x28, 0xa8, 0x68, 0xe8, 0x18, 0x98, 0x58, 0xd8, 0x38, 0xb8, 0x78, 0xf8,
@@ -49,10 +49,9 @@ var multeight = []uint{
 }
 
 func reverseBits1(num uint) uint {
-	var x, bit, i, j uint
+	var x, bit uint
 
-	i = bits.UintSize - 1
-	for ; j < bits.UintSize; j++ {
+	for i, j := bits.UintSize-1, 0; j < bits.UintSize; j++ {
 		bit = 1 << i
 		if (num & bit) == bit {
 			x |= 1 << j
@@ -63,22 +62,22 @@ func reverseBits1(num uint) uint {
 }
 
 func reverseBits2(num uint) uint {
-	var x, i, nibbles, rev uint
+	var x, index uint
 
-	nibbles = (bits.UintSize / 8) << 1
-	for ; i < nibbles; i++ {
-		rev = revmap[(num&(0xf<<multfour[i]))>>multfour[i]]
-		x |= rev << multfour[nibbles-1-i]
+	nibbles := (bits.UintSize / 8) << 1
+	for i := 0; i < nibbles; i++ {
+		index = num & (0xf << multfour[i]) >> multfour[i]
+		x |= revmap[index] << multfour[nibbles-1-i]
 	}
 	return x
 }
 
 func reverseBits3(num uint) uint {
-	var x, i, rev uint
+	var x, index uint
 
-	for ; i < bits.UintSize/8; i++ {
-		rev = revmap2[(num&(0xff<<multeight[i]))>>multeight[i]]
-		x |= rev << multeight[(bits.UintSize/8)-1-i]
+	for i := 0; i < bits.UintSize/8; i++ {
+		index = num & (0xff << multeight[i]) >> multeight[i]
+		x |= revmap2[index] << multeight[(bits.UintSize/8)-1-i]
 	}
 	return x
 }
